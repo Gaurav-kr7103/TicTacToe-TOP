@@ -109,6 +109,9 @@ const Game = ( () => {
     function setGameActive() {
         gameActive = true;
     }
+    function setGameInactive () {
+        gameActive = false;
+    }
     function Start(player1Name, player2Name) {
         player1 = Player(player1Name, 'O');
         player2 = Player(player2Name, "X");
@@ -123,10 +126,18 @@ const Game = ( () => {
         player1Turn = !player1Turn;
         Board.playerMove(token);
     }
+    function player1Won() {
+        alert(`${player1.getPlayerName()} has won the game.`);
+    }
+    function player2Won() {
+        alert(`${player2.getPlayerName()} has won the game.`);
+    }
     return {
         Start,
         setGameActive,
         Play,
+        player1Won,
+        player2Won,
         isPlayer1Turn: () => player1Turn,
         isGameActive: () => gameActive
     }
@@ -150,7 +161,12 @@ boxes.forEach( (box) => {
             token = 'X';
         box.textContent = `${token}`;
         if (Board.hasPlayerWon()) {
-            console.log("Player won");
+            if (Game.isPlayer1Turn) {
+                Game.player1Won();
+            } else {
+                Game.player2Won();
+            }
+            location.reload();
         }
     });
 });
