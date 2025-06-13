@@ -15,12 +15,11 @@ const Board = (()=>{
             }
         }
     }
-
     function setLocation (r,c) {
         row = r;
         col = c;
     }
-    function canPlayerMove() {
+    function isAvailableSpace() {
         return (board[row][col] === 0);
     }
     function playerMove(token) {
@@ -85,20 +84,20 @@ const Board = (()=>{
 
         return false;
     }
-    return {makeBoard, playerMove, hasPlayerWon, movesCheck, setLocation, canPlayerMove};
+    return {makeBoard, isAvailableSpace, setLocation, playerMove, hasPlayerWon, movesCheck};
 })();
 
 function Player(name = "", token) {
     const PlayerName = name;
     const PlayerToken = token;
 
-    function sayPlayerName () {
+    function getPlayerName () {
         return PlayerName;
     }
-    function sayPlayerToken() {
+    function getPlayerToken() {
         return PlayerToken;
     }
-    return {sayPlayerName, sayPlayerToken}
+    return {getPlayerName, getPlayerToken}
 }
 
 
@@ -111,9 +110,10 @@ const Game = ( () => {
         gameActive = true;
     }
     function Start(player1Name, player2Name) {
-        Board.makeBoard();
         player1 = Player(player1Name, 'O');
         player2 = Player(player2Name, "X");
+        Board.makeBoard();
+        console.log(player1, player2, "board is made");
     }
     function Play() {
         let token = 'O';
@@ -123,28 +123,34 @@ const Game = ( () => {
         player1Turn = !player1Turn;
         Board.playerMove(token);
     }
-    return {Start, setGameActive, Play, player1Turn};
+    return {
+        Start,
+        setGameActive,
+        Play,
+        isPlayer1Turn: () => player1Turn,
+        isGameActive: () => gameActive
+    }
 })();
 
 
 const boxes = document.querySelectorAll(".box-parent > div")
 boxes.forEach( (box) => {
     box.addEventListener("click", () => {
-        if (!Game.gameActive)
+        if (!Game.isGameActive())
             return;
-        if (Game.gameActive === true) {
-            let val = box.dataset.value;
-            const row = Math.floor( (val-1) / 3 );
-            const col = (val-1) % 3;
-            Board.setLocation(row,col);
-            if (!Board.canPlayerMove())
-                return;
-            Game.Play();
-            let token = 'O';
-            if (!Game.player1Turn)
-                token = 'X';
-            box.textContent = `${token}`;
-            
+        let val = box.dataset.value;
+        const row = Math.floor( (val-1) / 3 );
+        const col = (val-1) % 3;
+        Board.setLocation(row,col);
+        if (!Board.isAvailableSpace())
+            return;
+        Game.Play();
+        let token = 'O';
+        if (!Game.isPlayer1Turn())
+            token = 'X';
+        box.textContent = `${token}`;
+        if (Board.hasPlayerWon()) {
+            console.log("Player won");
         }
     });
 });
@@ -155,6 +161,7 @@ startButton.addEventListener("click", () => {
     const player2Name = document.querySelector("#player2-name").value;
     Game.Start(player1Name, player2Name);
     Game.setGameActive();
+    console.log("startButton exe");
 });
 
 
