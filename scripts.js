@@ -16,16 +16,14 @@ const Board = (()=>{
         }
     }
 
-    function askLocation () {
-        row = Number(prompt("Enter the Row"));
-        col = Number(prompt("Enter the Column"));
+    function setLocation (r,c) {
+        row = r;
+        col = c;
+    }
+    function canPlayerMove() {
+        return (board[row][col] === 0);
     }
     function playerMove(token) {
-        askLocation();
-        if (board[row][col] !==0) {
-            playerMove(token);
-            return;
-        }
         board[row][col] = token;
         moves ++;
     }
@@ -37,8 +35,8 @@ const Board = (()=>{
     }
     function hasPlayerWon() {
         let val = row + col;
-        if (val % 2 == 0) {//check diagnols
-            //left diagnol
+        if (val % 2 == 0) {//check diagonals
+            //left diagonal
             let i=0, j=0;
             let ele = 0;
             while (i<3 && j<3) {
@@ -52,7 +50,7 @@ const Board = (()=>{
             if (ele == 3)
                 return true;
 
-            //right diagnol
+            //right diagonal
             i=0; j=2;
             ele = 0;
             while (i<3 && j>=0) {
@@ -87,7 +85,7 @@ const Board = (()=>{
 
         return false;
     }
-    return {makeBoard, playerMove, hasPlayerWon, movesCheck};
+    return {makeBoard, playerMove, hasPlayerWon, movesCheck, setLocation, canPlayerMove};
 })();
 
 function Player(name = "", token) {
@@ -103,30 +101,60 @@ function Player(name = "", token) {
     return {sayPlayerName, sayPlayerToken}
 }
 
-Board.makeBoard();
-const player1 = Player("Player1", 'O');
-const player2 = Player("Player2", "X");
-const Game = ( () => {
-    function Begin() {
-        while (1) {
-            Board.playerMove(player1.sayPlayerToken());
-            if (Board.hasPlayerWon()) {
-                console.log(`${player1.sayPlayerName()} has won the game.`);
-                break;
-            } else {
-                Board.movesCheck();
-            }
 
-            Board.playerMove(player2.sayPlayerToken());
-            if (Board.hasPlayerWon()) {
-                console.log(`${player2.sayPlayerName()} has won the game.`);
-                break;
-            } else{
-                Board.movesCheck();
-            }
-        }
+const Game = ( () => {
+    let player1, player2;
+    let gameActive = false;
+    let player1Turn = true;
+
+    function setGameActive() {
+        gameActive = true;
     }
-    return {Begin};
+    function Start(player1Name, player2Name) {
+        Board.makeBoard();
+        player1 = Player(player1Name, 'O');
+        player2 = Player(player2Name, "X");
+    }
+    function Play() {
+        let token = 'O';
+        if (!player1Turn) {
+            token = 'X'
+        }
+        player1Turn = !player1Turn;
+        Board.playerMove(token);
+    }
+    return {Start, setGameActive, Play, player1Turn};
 })();
 
-Game.Begin();
+
+const boxes = document.querySelectorAll(".box-parent > div")
+boxes.forEach( (box) => {
+    box.addEventListener("click", () => {
+        if (!Game.gameActive)
+            return;
+        if (Game.gameActive === true) {
+            let val = box.dataset.value;
+            const row = Math.floor( (val-1) / 3 );
+            const col = (val-1) % 3;
+            Board.setLocation(row,col);
+            if (!Board.canPlayerMove())
+                return;
+            Game.Play();
+            let token = 'O';
+            if (!Game.player1Turn)
+                token = 'X';
+            box.textContent = `${token}`;
+            
+        }
+    });
+});
+
+const startButton = document.querySelector("#start-btn");
+startButton.addEventListener("click", () => {
+    const player1Name = document.querySelector("#player1-name").value;
+    const player2Name = document.querySelector("#player2-name").value;
+    Game.Start(player1Name, player2Name);
+    Game.setGameActive();
+});
+
+

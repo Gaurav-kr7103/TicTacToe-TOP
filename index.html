@@ -3,9 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>TicTacToe-TOP</title>
+    <link rel="stylesheet" href="./my-styles.css">
 </head>
 <body>
+    <h1>TicTacToe</h1>
+    <div class="player-info">
+        <div>
+            <div>
+                <label for="player1-name">Player 1 Name</label>
+                <input type="text" id="player1-name" name="player1-name" value="" placeholder="Narendra">
+            </div>
+            <div>
+                <label for="player2-name">Player 2 Name</label>
+                <input type="text" id="player2-name" name="player2-name" value="" placeholder="Modi">
+            </div>    
+        </div>
+        <div>
+            <button id="start-btn">Start</button>
+            <button>Reset</button>
+        </div>
+    </div>
+    <div class="container">
+        <div class="box-parent">
+            <div class="box1" data-value="1"></div>
+            <div class="box2" data-value="2"></div>
+            <div class="box3" data-value="3"></div>
+            <div class="box4" data-value="4"></div>
+            <div class="box5" data-value="5"></div>
+            <div class="box6" data-value="6"></div>
+            <div class="box7" data-value="7"></div>
+            <div class="box8" data-value="8"></div>
+            <div class="box9" data-value="9"></div>
+        </div>
+    </div>
     <script src="./scripts.js"></script>
 </body>
 </html>
